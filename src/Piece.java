@@ -7,6 +7,7 @@ public class Piece {
 
     private Color color;
     private boolean IsMaster;
+    private boolean alive;
 
     /**
      * Construtor que define a cor e o tipo da peça
@@ -16,6 +17,7 @@ public class Piece {
     public Piece(Color color, boolean isMaster) {
         this.color = color;
         this.IsMaster = isMaster;
+        this.alive = true;
     }
 
     /**
@@ -39,6 +41,6 @@ public class Piece {
      * @return Booleano true para caso esteja em jogo e false caso contrário
      */
     public boolean isAlive() {
-        return false;
+        return alive;
     }
 }
