@@ -6,6 +6,8 @@ import exceptions.InvalidCardException;
 import exceptions.InvalidPieceException;
 
 public class GameImpl implements Game {
+
+    Piece[] pieces;
     
     /**
      * Método que devolve a cor da posição do tabuleiro. Se possui uma cor, significa que é um templo. Caso contrário, é um espaço normal
@@ -79,6 +81,8 @@ public class GameImpl implements Game {
      * OBS: Esse método é opcional não será utilizado na correção, mas serve para acompanhar os resultados parciais do jogo
      */
     public void printBoard(){
+
+
 
     }
 
