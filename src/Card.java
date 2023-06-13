@@ -1,3 +1,5 @@
+import java.util.Random;
+
 import enums.Color;
 
 /**
@@ -52,5 +54,27 @@ public class Card {
      * @return Vetor de cartas com todas as cartas do jogo
      */
     public static Card[] createCards() {
-        return null;
+       Card[] allCards = {
+        new Card("Tiger", Color.BLUE, new Position[]{new Position(0, 2), new Position(0, -1)}),
+        new Card("Dragon", Color.RED, new Position[]{new Position(-2, 1), new Position(2, 0), new Position(-1,-1), new Position(1, -1)}),
+        new Card("Frog", Color.RED, new Position[]{new Position(1, -1), new Position(-1, 1), new Position(-2, 0)}),
+        new Card("Rabbit", Color.BLUE, new Position[]{new Position(-1, -1), new Position(2, 0), new Position(1, 1)}),
+        new Card("Crab", Color.BLUE, new Position[]{new Position(-2, 0), new Position(2, 0), new Position(1, 0)}),
+        new Card("Elephant", Color.RED, new Position[]{new Position(-1, 0), new Position(1, 0), new Position(-1, 1), new Position(1, 1)}),
+        new Card("Goose", Color.BLUE, new Position[]{new Position(-1, -1), new Position(-1, 0), new Position(1, 0), new Position(1, -1)}),
+        new Card("Rooster", Color.RED, new Position[]{new Position(-1, 0), new Position(-1, -1), new Position(1, 1), new Position(1, 0)})
+    };
+
+    Random random = new Random();
+    for (int i = allCards.length - 1; i > 0; i--) {
+        int j = random.nextInt(i + 1);
+        Card temp = allCards[i];
+        allCards[i] = allCards[j];
+        allCards[j] = temp;
+    }
+
+    Card[] selectedCards = new Card[5];
+    System.arraycopy(allCards, 0, selectedCards, 0, 5);
+
+    return selectedCards;
     }}

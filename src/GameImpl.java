@@ -1,4 +1,6 @@
 
+import java.util.Scanner;
+
 import enums.Color;
 import exceptions.IllegalMovementException;
 import exceptions.IncorrectTurnOrderException;
@@ -7,15 +9,38 @@ import exceptions.InvalidPieceException;
 
 public class GameImpl implements Game {
 
+    private Spot[][] board;
+    private Player bluePlayer;
+    private Player redPlayer;
+    private Player currentPlayer;
+    private boolean isGameOver;
+    private Scanner scanner;
+    private Card tableCard;
+    private Card[] deck;
+    
     Piece[] pieces;
     
+    public GameImpl(){
+
+    }
+
+    public GameImpl(String nameRedPlayer, String nameBluePlayer){
+        this.redPlayer = new Player(nameRedPlayer, Color.RED, deck);
+        this.bluePlayer = new Player(nameBluePlayer, Color.BLUE, deck);
+        
+    }
+
+    public GameImpl(String nameRedPlayer, String nameBluePlayer, Piece[] pieces){
+
+    }
+
     /**
      * Método que devolve a cor da posição do tabuleiro. Se possui uma cor, significa que é um templo. Caso contrário, é um espaço normal
      * @param position Posição do tabuleiro
      * @return O enum Color que representa a cor da posição
      */
     public Color getSpotColor(Position position){
-        return null;
+        return board[position.getRow()][position.getCol()].getColor();
     }
 
     /**
@@ -24,7 +49,7 @@ public class GameImpl implements Game {
      * @return Um objeto Piece que representa a peça na posição indicada. Se não tiver peça, devolve null
      */
     public Piece getPiece(Position position){
-        return null;
+        return board[position.getRow()][position.getCol()].getPiece();
     }
 
     /**
@@ -32,7 +57,7 @@ public class GameImpl implements Game {
      * @return Um objeto Card que representa a carta na mesa
      */
     public Card getTableCard(){
-        return null;
+        return tableCard;
     }
 
     /**
@@ -40,7 +65,7 @@ public class GameImpl implements Game {
      * @return Um objeto Player que representa o jogador vermelho
      */
     public Player getRedPlayer(){
-        return null;
+        return redPlayer;
     }
 
     /**
@@ -48,7 +73,7 @@ public class GameImpl implements Game {
      * @return Um objeto Player que representa o jogador azul
      */
     public Player getBluePlayer(){
-        return null;
+        return bluePlayer;
     };
 
     /**

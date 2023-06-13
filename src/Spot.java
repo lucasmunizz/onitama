@@ -73,7 +73,7 @@ public class Spot {
      * @return Um booleano que indica se o objeto representa uma posição válida no tabuleiro
      */
     public boolean isValid() {
-        return false;
+        return (position.getRow() >= 0 && position.getRow() < 5 && position.getCol() >= 0 && position.getCol() < 5);
     }
 
     /**
