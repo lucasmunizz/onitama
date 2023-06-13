@@ -43,4 +43,13 @@ public class Piece {
     public boolean isAlive() {
         return alive;
     }
+
+    @Override
+	public String toString() {
+        if (isMaster()){
+            return "M";
+        }
+		
+        return "A";
+	}
 }

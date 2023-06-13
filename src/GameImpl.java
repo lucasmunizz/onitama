@@ -87,7 +87,11 @@ public class GameImpl implements Game {
      * @exception InvalidPieceException Caso uma peça que não está no tabuleiro seja usada
      */
     public void makeMove(Piece piece, Card card, Position position) throws IncorrectTurnOrderException, IllegalMovementException, InvalidCardException, InvalidPieceException {
-        
+        if (currentPlayer.getPieceColor() != piece.getColor()){
+              throw new IncorrectTurnOrderException("Não é a vez do jogador fazer um movimento.");
+        }
+
+
     }
 
     /**
@@ -107,8 +111,23 @@ public class GameImpl implements Game {
      */
     public void printBoard(){
 
+    }
 
+    private void initializeBoard(){
+        board = new Spot[5][5];
+        
+        board[0][2] = new Spot(new Piece(Color.BLUE, true), new Position(0, 2));
+        board[4][2] = new Spot(new Piece(Color.RED, true), new Position(4, 2));
 
+        for (int row = 0; row < 5; row++) {
+            for (int col = 0; col < 5; col++) {
+                if (row == 0) {
+                    board[row][col] = new Spot(new Piece(Color.BLUE, false), new Position(row, col));
+                } else if (row == 4) {
+                    board[row][col] = new Spot(new Piece(Color.RED, false), new Position(row, col));
+                }
+            }
+        }
     }
 
 
