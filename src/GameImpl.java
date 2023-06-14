@@ -113,6 +113,9 @@ public class GameImpl implements Game {
             throw new IllegalMovementException("A posição já está ocupada");
         }
 
+        if (!validMove(piece, card, position)){
+            throw new IllegalMovementException("Movimento inválido para a carta");
+        }
 
         Spot currentSpot = getPieceSpot(piece);
 
@@ -131,7 +134,14 @@ public class GameImpl implements Game {
 
         this.tableCard = card;
 
-        currentPlayer = (currentPlayer == bluePlayer) ? redPlayer : bluePlayer;
+        if (checkVictory(currentPlayer.getPieceColor())){
+            System.out.println("Jogador " + currentPlayer.getName() + " ganhou");
+        }
+        else {
+            currentPlayer = (currentPlayer == bluePlayer) ? redPlayer : bluePlayer;
+        }
+
+        
 
 
     }
@@ -144,7 +154,33 @@ public class GameImpl implements Game {
      * @return Um booleano true para caso esteja em condições de vencer e false caso contrário
      */
     public boolean checkVictory(Color color){
-        return false;
+        Player player = (color == color.RED) ? redPlayer : bluePlayer;
+        
+
+        // return player.hasMaster() && player.getMaster().isCaptured()
+        //         || player.getMaster().getPosition().isOpponentBase(color);
+
+        Spot masterSpot = null;
+        for(Spot [] row : board){
+            for (Spot spot : row){
+                Piece piece = spot.getPiece();
+                if (piece != null && piece.getColor() == color && piece.isMaster()){
+                    masterSpot = spot;
+                    break;
+                }
+            }
+
+            if (masterSpot == null || masterSpot.getPiece() == null || !masterSpot.getPiece().isAlive()){
+                return false;
+            }
+        }
+
+        Player opponentColor = (color == color.RED) ? bluePlayer : redPlayer;
+
+        Spot opponentTemple = getTempleSpot(opponentColor.getPieceColor());
+
+        return masterSpot == opponentTemple;
+
     }
 
     /**
@@ -202,9 +238,8 @@ public class GameImpl implements Game {
         if(piece != null && piece.isMaster()){
             //vitoria
         }
-
         //spot.occupySpot(piece);
-
+        piece.setAlive(false);
         spot.releaseSpot();
         //newSpot.occupySpot(piece);
     }
@@ -255,6 +290,15 @@ public boolean validMove(Piece piece, Card card, Position position){
     }
 
     return true;
+}
+
+private Spot getTempleSpot(Color color) {
+    if (color == Color.BLUE) {
+        return board[0][2]; // Exemplo de posição do templo azul
+    } else if (color == Color.RED) {
+        return board[4][2]; // Exemplo de posição do templo vermelho
+    }
+    return null; // Retornar null para outras cores
 }
 
 }

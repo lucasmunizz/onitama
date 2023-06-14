@@ -44,6 +44,10 @@ public class Piece {
         return alive;
     }
 
+    public void setAlive(boolean alive) {
+        this.alive = alive;
+    }
+
     @Override
 	public String toString() {
         if (isMaster()){
