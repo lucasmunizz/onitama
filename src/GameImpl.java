@@ -1,4 +1,5 @@
 
+import java.lang.annotation.Target;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -115,8 +116,6 @@ public class GameImpl implements Game {
 
         Spot currentSpot = getPieceSpot(piece);
 
-        Position currentPosition = currentSpot.getPosition();
-
         Spot destinationSpot = board[position.getRow()][position.getCol()];
 
         if (destinationSpot.isOccupied() && destinationSpot.getPiece().getColor() == piece.getColor()){
@@ -210,11 +209,6 @@ public class GameImpl implements Game {
         //newSpot.occupySpot(piece);
     }
 
-    private void movePiece(Piece piece, Position position){
-
-
-
-    }
 
 private Spot getPieceSpot(Piece piece) {
     for (int row = 0; row < board.length; row++) {
@@ -234,5 +228,33 @@ private Spot getPieceSpot(Piece piece) {
 //     Piece piece = board[position.getRow()][position.getCol()].getPiece();
 //     return piece != null && piece.getColor() == color;
 // }
+
+public boolean validMove(Piece piece, Card card, Position position){
+    Spot currentSpot = getPieceSpot(piece);
+
+    if (currentSpot == null && !currentSpot.isOccupied()){
+        throw new InvalidPieceException("Peça inválida");
+    }
+
+    if(!board[position.getRow()][position.getCol()].isValid()){
+        throw new IllegalMovementException("Posição inválida");
+    }
+
+    Position [] possiblePositions = card.getPositions();
+    boolean validPosition = false;
+
+    for (Position pos : possiblePositions){
+        if(pos.equals(position)){
+            validPosition = true;
+            break;
+        }
+    }
+
+    if(!validPosition){
+        throw new IllegalMovementException("Posição inválida pra essa carta");
+    }
+
+    return true;
+}
 
 }
