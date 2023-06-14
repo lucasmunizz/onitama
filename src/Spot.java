@@ -94,4 +94,9 @@ public class Spot {
     protected void releaseSpot() {
         piece = null;
     }
+
+    public boolean isOccupied(){
+        return piece != null;
+    }
+
 }

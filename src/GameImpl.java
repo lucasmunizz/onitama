@@ -1,4 +1,8 @@
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Scanner;
 
 import enums.Color;
@@ -21,17 +25,26 @@ public class GameImpl implements Game {
     Piece[] pieces;
     
     public GameImpl(){
-
     }
 
     public GameImpl(String nameRedPlayer, String nameBluePlayer){
+        deck = Card.createCards();
         this.redPlayer = new Player(nameRedPlayer, Color.RED, deck);
         this.bluePlayer = new Player(nameBluePlayer, Color.BLUE, deck);
+        tableCard = deck[0];
         
     }
 
-    public GameImpl(String nameRedPlayer, String nameBluePlayer, Piece[] pieces){
+    public GameImpl(String nameRedPlayer, String nameBluePlayer, Card [] customDeck){
+        deck = Arrays.copyOf(customDeck, customDeck.length);
+        Collections.shuffle(Arrays.asList(deck));
 
+        tableCard = deck[0];
+
+        Card[] playerCards = Arrays.copyOfRange(deck, 1, 6);
+
+        this.redPlayer = new Player(nameRedPlayer, Color.RED, playerCards);
+        this.bluePlayer = new Player(nameBluePlayer, Color.BLUE, playerCards);
     }
 
     /**
@@ -88,8 +101,38 @@ public class GameImpl implements Game {
      */
     public void makeMove(Piece piece, Card card, Position position) throws IncorrectTurnOrderException, IllegalMovementException, InvalidCardException, InvalidPieceException {
         if (currentPlayer.getPieceColor() != piece.getColor()){
-              throw new IncorrectTurnOrderException("Não é a vez do jogador fazer um movimento.");
+            throw new IncorrectTurnOrderException("Não é a vez do jogador fazer um movimento.");
         }
+
+        if (!board[position.getRow()][position.getCol()].isValid()){
+            throw new IllegalMovementException("Movimento fora do tabuleiro");
+        }
+
+        if (board[position.getRow()][position.getCol()].isOccupied()){
+            throw new IllegalMovementException("A posição já está ocupada");
+        }
+
+
+        Spot currentSpot = getPieceSpot(piece);
+
+        Position currentPosition = currentSpot.getPosition();
+
+        Spot destinationSpot = board[position.getRow()][position.getCol()];
+
+        if (destinationSpot.isOccupied() && destinationSpot.getPiece().getColor() == piece.getColor()){
+            throw new IllegalMovementException("Posição já ocupada por peça de mesma cor");
+        }
+
+        capturePiece(position);
+
+        destinationSpot.occupySpot(piece);
+        currentSpot.releaseSpot();
+
+        currentPlayer.swapCard(card, tableCard);
+
+        this.tableCard = card;
+
+        currentPlayer = (currentPlayer == bluePlayer) ? redPlayer : bluePlayer;
 
 
     }
@@ -110,14 +153,30 @@ public class GameImpl implements Game {
      * OBS: Esse método é opcional não será utilizado na correção, mas serve para acompanhar os resultados parciais do jogo
      */
     public void printBoard(){
+        System.out.println("   0  1  2  3  4");
+        System.out.println("----------------");
+        for (int i = 0; i < 5; i++){
+            System.out.print(i + "|");
+            for (int j = 0; j < 5; j++){
+                Spot s = board[i][j];
+                if(s.isOccupied()){
+                    Piece piece = s.getPiece();
+                    System.out.print(piece + " ");
+                }
+                else {
+                    System.out.print("  ");
+                }
+            }
+            System.out.println("|" + i);
+        }
+
+         System.out.println("----------------");
+         System.out.println(" 0  1  2  3  4");
 
     }
 
-    private void initializeBoard(){
+    public void initializeBoard(){
         board = new Spot[5][5];
-        
-        board[0][2] = new Spot(new Piece(Color.BLUE, true), new Position(0, 2));
-        board[4][2] = new Spot(new Piece(Color.RED, true), new Position(4, 2));
 
         for (int row = 0; row < 5; row++) {
             for (int col = 0; col < 5; col++) {
@@ -125,10 +184,55 @@ public class GameImpl implements Game {
                     board[row][col] = new Spot(new Piece(Color.BLUE, false), new Position(row, col));
                 } else if (row == 4) {
                     board[row][col] = new Spot(new Piece(Color.RED, false), new Position(row, col));
+                }else{
+                    board[row][col] = new Spot(new Position(row, col));
+
                 }
+
+            }
+        }
+
+        board[0][2] = new Spot(new Piece(Color.BLUE, true), new Position(0, 2));
+        board[4][2] = new Spot(new Piece(Color.RED, true), new Position(4, 2));
+    }
+
+    private void capturePiece(Position position){
+        Spot spot = board[position.getRow()][position.getRow()];
+        Piece piece = spot.getPiece();
+
+        if(piece != null && piece.isMaster()){
+            //vitoria
+        }
+
+        //spot.occupySpot(piece);
+
+        spot.releaseSpot();
+        //newSpot.occupySpot(piece);
+    }
+
+    private void movePiece(Piece piece, Position position){
+
+
+
+    }
+
+private Spot getPieceSpot(Piece piece) {
+    for (int row = 0; row < board.length; row++) {
+        for (int col = 0; col < board[row].length; col++) {
+            Spot spot = board[row][col];
+            if (spot != null && spot.getPiece() == piece) {
+                return spot;
             }
         }
     }
+    return null;
 
+ }
+
+
+//  private boolean isOccupiedBySameColor(Position position, Color color) {
+//     Piece piece = board[position.getRow()][position.getCol()].getPiece();
+//     return piece != null && piece.getColor() == color;
+// }
 
 }
