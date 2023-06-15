@@ -26,6 +26,11 @@ public class GameImpl implements Game {
     Piece[] pieces;
     
     public GameImpl(){
+        deck = Card.createCards();
+        this.redPlayer = new Player("PlayerRed", Color.RED, deck);
+        this.bluePlayer = new Player("PlayerBlue", Color.BLUE, deck);
+        tableCard = deck[0];
+        initializeBoard();
     }
 
     public GameImpl(String nameRedPlayer, String nameBluePlayer){
@@ -33,6 +38,7 @@ public class GameImpl implements Game {
         this.redPlayer = new Player(nameRedPlayer, Color.RED, deck);
         this.bluePlayer = new Player(nameBluePlayer, Color.BLUE, deck);
         tableCard = deck[0];
+        initializeBoard();
         
     }
 
@@ -46,6 +52,7 @@ public class GameImpl implements Game {
 
         this.redPlayer = new Player(nameRedPlayer, Color.RED, playerCards);
         this.bluePlayer = new Player(nameBluePlayer, Color.BLUE, playerCards);
+        initializeBoard();
     }
 
     /**
