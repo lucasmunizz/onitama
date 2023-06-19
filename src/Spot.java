@@ -64,7 +64,7 @@ public class Spot {
      * Método que devolve a cor do espaço
      * @return Enum Color com a cor do espaço. Caso o espaço não tenha cor, o valor do enum será NONE
      */
-    Color getColor() {
+    public Color getColor() {
         return color;
     }
 

@@ -77,4 +77,22 @@ public class Card {
     System.arraycopy(allCards, 0, selectedCards, 0, 5);
 
     return selectedCards;
-    }}
+    }
+
+
+    public String[] getPositionsAsString() {
+    Position[] positions = getPositions();
+    String[] positionsAsStrings = new String[positions.length];
+
+    for (int i = 0; i < positions.length; i++) {
+        Position position = positions[i];
+        String positionString = "(" + position.getRow() + ", " + position.getCol() + ")";
+        positionsAsStrings[i] = positionString;
+    }
+
+    return positionsAsStrings;
+}
+
+
+
+}

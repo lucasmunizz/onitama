@@ -37,9 +37,10 @@ public class GameImpl implements Game {
         deck = Card.createCards();
         this.redPlayer = new Player(nameRedPlayer, Color.RED, deck);
         this.bluePlayer = new Player(nameBluePlayer, Color.BLUE, deck);
+        currentPlayer = redPlayer;
         tableCard = deck[0];
         initializeBoard();
-        
+        playGame();
     }
 
     public GameImpl(String nameRedPlayer, String nameBluePlayer, Card [] customDeck){
@@ -107,46 +108,42 @@ public class GameImpl implements Game {
      * @exception InvalidCardException Caso uma carta que não está na mão do jogador seja usada
      * @exception InvalidPieceException Caso uma peça que não está no tabuleiro seja usada
      */
-    public void makeMove(Piece piece, Card card, Position position) throws IncorrectTurnOrderException, IllegalMovementException, InvalidCardException, InvalidPieceException {
-        if (currentPlayer.getPieceColor() != piece.getColor()){
-            throw new IncorrectTurnOrderException("Não é a vez do jogador fazer um movimento.");
-        }
+    public void makeMove(Card card, Position cardMove, Position currentPos) throws IncorrectTurnOrderException, IllegalMovementException, InvalidCardException, InvalidPieceException {
+        // if (!board[cardMove.getRow()][cardMove.getCol()].isValid()){
+        //     throw new IllegalMovementException("Movimento fora do tabuleiro");
+        // }
 
-        if (!board[position.getRow()][position.getCol()].isValid()){
-            throw new IllegalMovementException("Movimento fora do tabuleiro");
-        }
+        // if (board[cardMove.getRow()][cardMove.getCol()].isOccupied()){
+        //     throw new IllegalMovementException("A posição já está ocupada");
+        // }
 
-        if (board[position.getRow()][position.getCol()].isOccupied()){
-            throw new IllegalMovementException("A posição já está ocupada");
-        }
+        // if (!validMove(card, cardMove, currentPos)){
+        //     throw new IllegalMovementException("Movimento inválido para a carta");
+        // }
 
-        if (!validMove(piece, card, position)){
-            throw new IllegalMovementException("Movimento inválido para a carta");
-        }
+        Spot currentSpot = board[currentPos.getRow()][currentPos.getCol()];
 
-        Spot currentSpot = getPieceSpot(piece);
+        Spot destinationSpot = board[cardMove.getRow()][cardMove.getCol()];
 
-        Spot destinationSpot = board[position.getRow()][position.getCol()];
+        // if (currentPlayer.getPieceColor() != currentSpot.getPiece().getColor()){
+        //     throw new IncorrectTurnOrderException("Não é a vez do jogador fazer um movimento.");
+        // }
 
-        if (destinationSpot.isOccupied() && destinationSpot.getPiece().getColor() == piece.getColor()){
-            throw new IllegalMovementException("Posição já ocupada por peça de mesma cor");
-        }
+        // if (destinationSpot.isOccupied() && destinationSpot.getPiece().getColor() == currentSpot.getPiece().getColor()){
+        //     throw new IllegalMovementException("Posição já ocupada por peça de mesma cor");
+        // }
 
-        capturePiece(position);
-
-        destinationSpot.occupySpot(piece);
+        destinationSpot.occupySpot(currentSpot.getPiece());
         currentSpot.releaseSpot();
+
 
         currentPlayer.swapCard(card, tableCard);
 
         this.tableCard = card;
 
-        if (checkVictory(currentPlayer.getPieceColor())){
-            System.out.println("Jogador " + currentPlayer.getName() + " ganhou");
-        }
-        else {
-            currentPlayer = (currentPlayer == bluePlayer) ? redPlayer : bluePlayer;
-        }
+
+        currentPlayer = (currentPlayer == bluePlayer) ? redPlayer : bluePlayer;
+        
 
         
 
@@ -162,59 +159,78 @@ public class GameImpl implements Game {
      */
     public boolean checkVictory(Color color){
         Player player = (color == color.RED) ? redPlayer : bluePlayer;
+        Player opponent = (player.getPieceColor() == color.RED) ? bluePlayer: redPlayer;
         
 
-        // return player.hasMaster() && player.getMaster().isCaptured()
-        //         || player.getMaster().getPosition().isOpponentBase(color);
+        Spot opponentTemple = getTempleSpot(opponent.getPieceColor());
 
-        Spot masterSpot = null;
-        for(Spot [] row : board){
-            for (Spot spot : row){
-                Piece piece = spot.getPiece();
-                if (piece != null && piece.getColor() == color && piece.isMaster()){
-                    masterSpot = spot;
-                    break;
+        Piece piece = opponentTemple.getPiece();
+
+        if (piece != null && piece.isMaster() && piece.getColor() == player.getPieceColor()){
+            return true;
+        }
+        
+        Spot masSpot = null;
+
+        for (int row = 0; row < 5; row++){
+            for (int col = 0; col < 5; col++ ){
+                masSpot = board[row][col];
+                Piece auxPiece = masSpot.getPiece();
+                if (auxPiece != null && auxPiece.isMaster() && auxPiece.getColor() == opponent.getPieceColor()){
+                    return false;
                 }
-            }
-
-            if (masterSpot == null || masterSpot.getPiece() == null || !masterSpot.getPiece().isAlive()){
-                return false;
             }
         }
 
-        Player opponentColor = (color == color.RED) ? bluePlayer : redPlayer;
-
-        Spot opponentTemple = getTempleSpot(opponentColor.getPieceColor());
-
-        return masterSpot == opponentTemple;
-
+        return true;
     }
 
     /**
      * Método que imprime o tabuleiro no seu estado atual
      * OBS: Esse método é opcional não será utilizado na correção, mas serve para acompanhar os resultados parciais do jogo
      */
+    // public void printBoard(){
+    //     System.out.println("   0  1  2  3  4");
+    //     System.out.println("----------------");
+    //     for (int i = 0; i < 5; i++){
+    //         System.out.print(i + "|");
+    //         for (int j = 0; j < 5; j++){
+    //             Spot s = board[i][j];
+    //             if(s.isOccupied()){
+    //                 Piece piece = s.getPiece();
+    //                 System.out.print(piece + " ");
+    //             }
+    //             else {
+    //                 System.out.print("  ");
+    //             }
+    //         }
+    //         System.out.println("|" + i);
+    //     }
+
+    //      System.out.println("----------------");
+    //      System.out.println(" 0  1  2  3  4");
+
+    // }
+
     public void printBoard(){
-        System.out.println("   0  1  2  3  4");
-        System.out.println("----------------");
-        for (int i = 0; i < 5; i++){
-            System.out.print(i + "|");
-            for (int j = 0; j < 5; j++){
-                Spot s = board[i][j];
-                if(s.isOccupied()){
-                    Piece piece = s.getPiece();
-                    System.out.print(piece + " ");
-                }
-                else {
-                    System.out.print("  ");
+
+      System.out.println("Tabuleiro:");
+
+        for (int row = 0; row < 5; row++) {
+            for (int col = 0; col < 5; col++) {
+                Spot spot = board[row][col];
+                Piece piece = spot.getPiece();
+
+                if (piece != null) {
+                    System.out.print(piece.toString() + " ");
+                } else {
+                    System.out.print("- ");
                 }
             }
-            System.out.println("|" + i);
+            System.out.println();
         }
 
-         System.out.println("----------------");
-         System.out.println(" 0  1  2  3  4");
-
+        System.out.println();
     }
 
     public void initializeBoard(){
@@ -246,7 +262,6 @@ public class GameImpl implements Game {
             //vitoria
         }
         //spot.occupySpot(piece);
-        piece.setAlive(false);
         spot.releaseSpot();
         //newSpot.occupySpot(piece);
     }
@@ -271,14 +286,14 @@ private Spot getPieceSpot(Piece piece) {
 //     return piece != null && piece.getColor() == color;
 // }
 
-public boolean validMove(Piece piece, Card card, Position position){
-    Spot currentSpot = getPieceSpot(piece);
+public boolean validMove(Card card, Position cardMove, Position currPosition){
+    Spot currentSpot = board[currPosition.getRow()][currPosition.getCol()];
 
     if (currentSpot == null && !currentSpot.isOccupied()){
         throw new InvalidPieceException("Peça inválida");
     }
 
-    if(!board[position.getRow()][position.getCol()].isValid()){
+    if(!board[cardMove.getRow()][cardMove.getCol()].isValid()){
         throw new IllegalMovementException("Posição inválida");
     }
 
@@ -286,7 +301,7 @@ public boolean validMove(Piece piece, Card card, Position position){
     boolean validPosition = false;
 
     for (Position pos : possiblePositions){
-        if(pos.equals(position)){
+        if(pos.equals(cardMove)){
             validPosition = true;
             break;
         }
@@ -307,5 +322,80 @@ private Spot getTempleSpot(Color color) {
     }
     return null; // Retornar null para outras cores
 }
+
+private void playGame(){
+
+    Scanner scanner = new Scanner(System.in);
+
+    while(!checkVictory(currentPlayer.getPieceColor())){
+        printBoard();
+
+        Card selectedCard = selectCard();
+
+        Position currPosition = selectPiecePosition();
+
+        Position moveCard = selectMovePosition(selectedCard);  
+
+        try {
+            makeMove(selectedCard, moveCard, currPosition);
+        }
+
+        catch(Exception e){
+            System.out.println(e.getMessage());
+        }
+    }
+
+    printBoard();
+
+    Player winner = (currentPlayer == redPlayer) ? bluePlayer : redPlayer;
+    System.out.println("Parabéns, " + winner.getName() + "! Você venceu o jogo!");
+
+}
+
+private Card selectCard(){
+    Card [] cards = deck;
+
+    for (int i = 0; i < cards.length; i++){
+        System.out.println((i+1) + ": " + cards[i].getName());
+    }
+
+    Scanner scanner = new Scanner(System.in);
+    int cardIndex = scanner.nextInt();
+
+    Card selectedCard = cards[cardIndex - 1];
+
+    return selectedCard;
+
+}
+
+private Position selectMovePosition(Card card) {
+        System.out.println("Jogador " + currentPlayer.getName() + ", selecione uma posição de movimento:");
+        System.out.println(card.getPositionsAsString());
+
+        System.out.println("Digite a linha:");
+        Scanner scanner = new Scanner(System.in);
+        int row = scanner.nextInt();
+        System.out.println("Digite a coluna:");
+        int col = scanner.nextInt();
+
+        Position pos = new Position(row, col);
+
+        return pos;
+    }
+
+private Position selectPiecePosition() {
+        System.out.println("Jogador " + currentPlayer.getName() + ", selecione a posição da peça a ser movida:");
+        //System.out.println(currentPlayer.getOwnedPiecesAsString());
+
+        System.out.println("Digite a linha:");
+        Scanner scanner = new Scanner(System.in);
+        int row = scanner.nextInt();
+        System.out.println("Digite a coluna:");
+        int col = scanner.nextInt();
+
+        Position pos = new Position(row, col);
+
+        return pos;
+    }
 
 }
