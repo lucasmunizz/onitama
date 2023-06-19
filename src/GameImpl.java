@@ -119,16 +119,20 @@ public class GameImpl implements Game {
     @Override
     public void makeMove(Card card, Position cardMove, Position currentPos) throws IncorrectTurnOrderException, IllegalMovementException, InvalidCardException, InvalidPieceException {
 
-        if (!board[cardMove.getRow() + currentPos.getRow()][cardMove.getCol() + currentPos.getCol()].isValid()){
-            throw new IllegalMovementException("Movimento fora do tabuleiro");
-        }
-
         if (!board[currentPos.getRow()][currentPos.getCol()].isOccupied()){
             throw new InvalidPieceException("Não há nenhuma peça na posição");
         }
 
+        if (!board[cardMove.getRow() + currentPos.getRow()][cardMove.getCol() + currentPos.getCol()].isValid()){
+            throw new IllegalMovementException("Movimento fora do tabuleiro"); //index out of bonds
+        }
+
         if (!validMove(card, cardMove, currentPos)){
             throw new IllegalMovementException("Movimento inválido para a carta");
+        }
+
+        if (!currentPlayer.hasCard(card)){
+            throw new InvalidCardException("O jogador não possui a carta");
         }
        
         Spot currentSpot = board[currentPos.getRow()][currentPos.getCol()];
@@ -315,11 +319,10 @@ public class GameImpl implements Game {
             makeMove(selectedCard, moveCard, currPosition);
             gameOver = checkVictory(currentPlayer.getPieceColor()) ? true : false;
             switchTurn();
-
         }
 
         catch(Exception e){
-            System.out.println(e.getMessage());
+            System.out.println("Movimento fora do tabuleiro");
         }
     }
 
