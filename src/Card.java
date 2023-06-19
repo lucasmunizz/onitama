@@ -1,3 +1,4 @@
+import java.util.Arrays;
 import java.util.Random;
 
 import enums.Color;
@@ -55,15 +56,17 @@ public class Card {
      */
     public static Card[] createCards() {
        Card[] allCards = {
-        new Card("Tiger", Color.BLUE, new Position[]{new Position(0, 2), new Position(0, -1)}),
-        new Card("Dragon", Color.RED, new Position[]{new Position(-2, 1), new Position(2, 0), new Position(-1,-1), new Position(1, -1)}),
-        new Card("Frog", Color.RED, new Position[]{new Position(1, -1), new Position(-1, 1), new Position(-2, 0)}),
-        new Card("Rabbit", Color.BLUE, new Position[]{new Position(-1, -1), new Position(2, 0), new Position(1, 1)}),
-        new Card("Crab", Color.BLUE, new Position[]{new Position(-2, 0), new Position(2, 0), new Position(1, 0)}),
-        new Card("Elephant", Color.RED, new Position[]{new Position(-1, 0), new Position(1, 0), new Position(-1, 1), new Position(1, 1)}),
-        new Card("Goose", Color.BLUE, new Position[]{new Position(-1, -1), new Position(-1, 0), new Position(1, 0), new Position(1, -1)}),
-        new Card("Rooster", Color.RED, new Position[]{new Position(-1, 0), new Position(-1, -1), new Position(1, 1), new Position(1, 0)})
+        new Card("Tiger", Color.BLUE, new Position[]{new Position(-2, 0), new Position(1, 0)}),
+        new Card("Dragon", Color.RED, new Position[]{new Position(1, 1), new Position(-1, 2), new Position(1,-1), new Position(-1, -2)}),
+        new Card("Frog", Color.RED, new Position[]{new Position(0, -2), new Position(-1, -1), new Position(1, 1)}),
+        new Card("Rabbit", Color.BLUE, new Position[]{new Position(1, -1), new Position(-1, 1), new Position(0, 2)}),
+        new Card("Crab", Color.BLUE, new Position[]{new Position(0, -2), new Position(0, 2), new Position(-1, 0)}),
+        new Card("Elephant", Color.RED, new Position[]{new Position(0, -1), new Position(0, 1), new Position(-1, -1), new Position(-1, 1)}),
+        new Card("Goose", Color.BLUE, new Position[]{new Position(-1, -1), new Position(0, -1), new Position(0, 1), new Position(1, 1)}),
+        new Card("Rooster", Color.RED, new Position[]{new Position(0, -1), new Position(1, -1), new Position(0, 1), new Position(-1, 1)})
     };
+
+    //embaralhar
 
     Random random = new Random();
     for (int i = allCards.length - 1; i > 0; i--) {
@@ -79,20 +82,60 @@ public class Card {
     return selectedCards;
     }
 
-
-    public String[] getPositionsAsString() {
-    Position[] positions = getPositions();
-    String[] positionsAsStrings = new String[positions.length];
-
-    for (int i = 0; i < positions.length; i++) {
-        Position position = positions[i];
-        String positionString = "(" + position.getRow() + ", " + position.getCol() + ")";
-        positionsAsStrings[i] = positionString;
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((name == null) ? 0 : name.hashCode());
+        result = prime * result + ((color == null) ? 0 : color.hashCode());
+        result = prime * result + Arrays.hashCode(positions);
+        return result;
     }
 
-    return positionsAsStrings;
-}
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        Card other = (Card) obj;
+        if (name == null) {
+            if (other.name != null)
+                return false;
+        } else if (!name.equals(other.name))
+            return false;
+        if (color != other.color)
+            return false;
+        if (!Arrays.equals(positions, other.positions))
+            return false;
+        return true;
+    }
 
+    public void positionsAsString(Card card){
+        Position [] allowedPositions = getPositions();
+        for (Position pos : allowedPositions){
+            System.out.print(pos.toString() +", ");
+        }
+        System.out.println(); 
+    }
 
+    public static Card [] pickCustomDeck(Card [] customDeck){
+        Random random = new Random();
+        for (int i = customDeck.length - 1; i > 0; i--) {
+            int j = random.nextInt(i + 1);
+            Card temp = customDeck[i];
+            customDeck[i] = customDeck[j];
+            customDeck[j] = temp;
+        }
+
+        Card[] selectedCards = new Card[5];
+        System.arraycopy(customDeck, 0, selectedCards, 0, 5);
+
+        return selectedCards;
+    }
+
+    
 
 }

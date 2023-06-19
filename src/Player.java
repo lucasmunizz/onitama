@@ -80,6 +80,18 @@ public class Player {
         cards = updatedCards;
     }
 
+
+    public boolean hasCard(Card card) {
+        for (Card c : cards) {
+            if (c.equals(card)) {
+                return true;
+            }
+        }
+
+        return false;
+  }
+
+
     /**
      * Método que troca uma carta da mão por outra carta (idealmente da mesa)
      * @param oldCard A carta que será substituída
@@ -87,21 +99,19 @@ public class Player {
      * @exception InvalidCardException Caso a carta não esteja na mão do jogador e/ou na mesa
      */
     protected void swapCard(Card oldCard, Card newCard) throws InvalidCardException {
-        // boolean found = false;
-        // for (int i = 0; i < cards.length; i++) {
-        //     if (cards[i] == oldCard) {
-        //         cards[i] = newCard;
-        //         found = true;
-        //         break;
-        //     }
-        // }
-        // if (!found) {
-        //     throw new InvalidCardException("Card not found in player's hand.");
-        // }
+        if(!hasCard(oldCard)) {
+            throw new InvalidCardException("The card to be replaced is not in the player's hand.");
+        }
 
-        this.removeCard(oldCard);
-        this.addCard(newCard);
+    
 
+    // Substituir a carta na mão do jogador pela nova carta
+        for (int i = 0; i < cards.length; i++) {
+            if (cards[i].equals(oldCard)) {
+                cards[i] = newCard;
+                return;
+            }
+        }
     }
 
 }
